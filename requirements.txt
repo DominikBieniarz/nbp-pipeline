@@ -1,0 +1,8 @@
+requests
+tenacity
+pandas
+pyarrow
+google-cloud-bigquery
+python-dotenv
+pytest
+responses
