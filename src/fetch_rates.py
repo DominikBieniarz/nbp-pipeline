@@ -17,6 +17,7 @@ class ExchangeRate(BaseModel):
     no: str
     effectiveDate: date
     mid: float
+    currency: str
 
 
 def _chunk_date_range(date_from: date, date_to: date) -> list[tuple[date, date]]:
@@ -34,7 +35,7 @@ def _chunk_date_range(date_from: date, date_to: date) -> list[tuple[date, date]]
 def _fetch_one_chunk(currency: str, date_from: date, date_to: date) -> list[ExchangeRate]:
     """Fetch and validate a single chunk of NBP table-A rates (<=MAX_RANGE_DAYS)."""
     url = (
-        f"https://api.nbp.pl/api/exchangerates/rates/a/{currency}/"
+        f"https://api.nbp.pl/api/exchangerates/rates/a/{currency.lower()}/"
         f"{date_from.isoformat()}/{date_to.isoformat()}/?format=json"
     )
     logger.info("Fetching %s rates from %s to %s", currency.upper(), date_from, date_to)
@@ -48,7 +49,7 @@ def _fetch_one_chunk(currency: str, date_from: date, date_to: date) -> list[Exch
         logger.warning("No rates returned for %s to %s", date_from, date_to)
         return []
 
-    rates = [ExchangeRate(**item) for item in raw_rates]
+    rates = [ExchangeRate(**item, currency=currency.upper()) for item in raw_rates]
     logger.info("Parsed %d rates for %s to %s.", len(rates), date_from, date_to)
     return rates
 
