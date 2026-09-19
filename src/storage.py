@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 from src.fetch_rates import ExchangeRate
 import logging
+from src.config import PROJECT_ID, BIGQUERY_DATASET
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +29,10 @@ def save_to_parquet(df: pd.DataFrame, path:str) -> None:
     logger.info("Saved %d rates to parquet file at %s", len(df), file_path)
 
 
-def load_to_bigquery(df: pd.DataFrame, table_id: str) -> None:
+def load_to_bigquery(df: pd.DataFrame, table_name: str) -> None:
     """Load the DataFrame to a BigQuery table."""
-    client = bigquery.Client(project="REDACTED_PROJECT_ID")
+    client = bigquery.Client(project=PROJECT_ID)
+    table_id = f"{PROJECT_ID}.{BIGQUERY_DATASET}.{table_name}"
 
     job = client.load_table_from_dataframe(df, table_id)
     job.result()
